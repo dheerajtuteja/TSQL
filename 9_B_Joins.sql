@@ -37,7 +37,7 @@ TYPES OF NON-ANSI FORMAT JOINS:
 
 	C.) SELF JOIN JOIN
 
-REFER : https://github.com/dheerajtuteja/TSQL/blob/master/8_A_Joins.png
+REFER : https://github.com/dheerajtuteja/TSQL/blob/master/9_A_Joins.png
 
 */
 
