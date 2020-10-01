@@ -1,8 +1,8 @@
--- SOURCE : www.udemy.com/course/ssrs-t-sql-online-video-training/
-
-https://www.youtube.com/watch?v=cRkuJ56RgZY
-https://www.youtube.com/watch?v=j3qNaqqntZw
-https://www.youtube.com/watch?v=NsjDqFB69c0
+-- SOURCE : 
+-- www.udemy.com/course/ssrs-t-sql-online-video-training/
+-- https://www.youtube.com/watch?v=cRkuJ56RgZY
+-- https://www.youtube.com/watch?v=j3qNaqqntZw
+-- https://www.youtube.com/watch?v=NsjDqFB69c0
 
 USE MOVIES
 GO
@@ -197,3 +197,118 @@ SELECT DISTINCT([FilmDirectorID]) FROM [dbo].[tblFilm]
 SELECT * FROM [dbo].[tblDirector] WHERE
 [DirectorID] NOT IN 
 (SELECT DISTINCT([FilmDirectorID]) FROM [dbo].[tblFilm])
+
+
+--  ALL,  ANY/SOME CLAUSES 
+-- NOTE : ANY & SOME ARE SAME FUNCTIONALLY
+
+SELECT * FROM [dbo].[tblFilm]
+SELECT AVG([FilmRunTimeMinutes]) FROM [dbo].[tblFilm]
+
+-- FIND RECORDS WITH FILM RUN TIME MORE THAN AVERAGE OF ALL MOVIES
+
+SELECT * FROM [dbo].[tblFilm] WHERE [FilmRunTimeMinutes]>
+(SELECT AVG([FilmRunTimeMinutes]) FROM [dbo].[tblFilm])
+
+--WAQ TO LIST RECORDS WHICH HAS [FilmRunTimeMinutes] > THAN ID = 100 & 202
+
+SELECT * FROM [dbo].[tblFilm] WHERE [FilmRunTimeMinutes] >
+
+(SELECT [FilmRunTimeMinutes] FROM [dbo].[tblFilm] WHERE [FilmID]= 100 OR [FilmID] = 202)
+
+--NOW WE CANNOT PUT > INBETWEEN 2 QUERIES AS COLUMN HAS 2 VALUES (ID = 100 & 202)
+
+SELECT * FROM [dbo].[tblFilm] WHERE [FilmRunTimeMinutes] >
+
+ALL(SELECT [FilmRunTimeMinutes] FROM [dbo].[tblFilm] WHERE [FilmID]= 100 OR [FilmID] = 202)
+
+ORDER BY [FilmRunTimeMinutes] DESC
+
+
+-- CORELATED SUBQUERY
+-- WHEN ANY COLUMN OF THE OUTER QUERY IS USED IN THE INNER QUERY, IT IS CALLED CORELATED SUB QUERY
+
+--DATA PREPARATION
+create table mydemo.HumanResource
+(
+    id int,
+	name varchar(40)
+
+)
+
+--The employees of the company
+create table mydemo.tblEmployee
+(
+    id int,
+	department varchar(40)
+
+)
+
+
+--Bonus provided by the company
+create table mydemo.tblSales
+(
+    id int,
+	bonus int
+)
+
+
+insert into mydemo.HumanResource values (1,'N1'),(2,'N2'),(3,'N3'),(4,'N4'),(5,'N5')
+insert into mydemo.tblEmployee values (2,'D1'),(4,'D4'),(5,'D2')
+insert into mydemo.tblSales values (1,1000),(2,2000),(2,3000),(2,4000),(3,4567),(3,2000),(4,2000),(4,4760),(5,7867)
+insert into mydemo.tblEmployee values (2,'D2')
+
+select * from mydemo.HumanResource
+select * from mydemo.tblEmployee
+select * from mydemo.tblSales
+
+
+
+-- The list of employees along with the department Name who had got the bonus of 2000 using correlated sudquery
+
+select h.id,h.name,e.department from 
+mydemo.HumanResource h inner join mydemo.tblEmployee e on h.id=e.id
+where 3000 in
+(
+     select bonus from mydemo.tblSales s where s.id=e.id
+)
+
+-- CO-RELATED SUBQUERY WITH NOT EXISTS
+
+-- DATA PREPARATION
+
+CREATE TABLE MYDEMO.[tblDiscount](
+	[ProductID] [int] NULL,
+	[Rate] [decimal](5, 3) NULL
+) 
+
+CREATE TABLE MYDEMO.[tblProduct](
+	[ProductID] [int] NULL,
+	[ProductName] [varchar](50) NULL,
+	[Price] [int] NULL
+) 
+
+INSERT MYDEMO.[tblDiscount] ([ProductID], [Rate]) VALUES (1, CAST(0.010 AS Decimal(5, 3)))
+INSERT MYDEMO.[tblDiscount] ([ProductID], [Rate]) VALUES (1, CAST(0.050 AS Decimal(5, 3)))
+INSERT MYDEMO.[tblDiscount] ([ProductID], [Rate]) VALUES (3, CAST(0.100 AS Decimal(5, 3)))
+INSERT MYDEMO.[tblDiscount] ([ProductID], [Rate]) VALUES (5, CAST(0.090 AS Decimal(5, 3)))
+INSERT MYDEMO.[tblDiscount] ([ProductID], [Rate]) VALUES (5, CAST(0.190 AS Decimal(5, 3)))
+INSERT MYDEMO.[tblProduct] ([ProductID], [ProductName], [Price]) VALUES (1, 'Prod1', 100)
+INSERT MYDEMO.[tblProduct] ([ProductID], [ProductName], [Price]) VALUES (2, 'Prod2', 200)
+INSERT MYDEMO.[tblProduct] ([ProductID], [ProductName], [Price]) VALUES (3, 'Prod3', 100)
+INSERT MYDEMO.[tblProduct] ([ProductID], [ProductName], [Price]) VALUES (4, 'Prod4', 400)
+INSERT MYDEMO.[tblProduct] ([ProductID], [ProductName], [Price]) VALUES (5, 'Prod4', 400)
+
+
+--EXAMPLE
+
+SELECT * FROM MYDEMO.[tblDiscount]
+select * from MYDEMO.tblProduct
+
+select * from MYDEMO.tblProduct p
+where not exists
+(
+     select 1 from MYDEMO.tblDiscount d where  d.ProductID=p.ProductID
+
+)
+--CORELATED SUBQUERY IS FASTER THAN LEFT OUTER JOIN
