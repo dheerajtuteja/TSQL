@@ -1,5 +1,6 @@
 -- VARIABLES:
 -- https://www.guru99.com/sql-server-variable.html
+-- https://www.sqlshack.com/sql-variables-basics-and-usage/
 
 DECLARE @COURSE_ID as INT, @COURSE_NAME AS VARCHAR(5)
 SET @COURSE_ID = 5
